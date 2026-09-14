@@ -1,0 +1,43 @@
+services:
+  blog_db:
+    image: postgres:18
+    container_name: blog_db
+    env_file:
+      - path: .env
+        required: true
+    ports:
+    - "${MAIN_DB_EXPOSED_DEV_PORT}:5432" # to be removed in prod pleeaase hahahah
+    environment:
+      POSTGRES_USER: ${MAIN_DB_USER}
+      POSTGRES_PASSWORD: ${MAIN_DB_PASSWORD}
+      POSTGRES_DB: ${MAIN_DB_NAME}
+    volumes:
+    - ${MAIN_DB_DIR_PATH}:/var/lib/postgresql/data/base
+    - ./scripts/main_db/init.sh:/docker-entrypoint-initdb.d/init.sh
+    restart: unless-stopped
+
+  blog_api:
+    image: blog_api
+    container_name: blog_api
+    env_file:
+      - path: .env
+        required: true      
+    environment:
+      ConnectionStrings__DefaultConnection: "Host=${BACKEND_APP_DB_HOSTNAME};Port=${BACKEND_APP_DB_PORT};Database=${MAIN_DB_NAME};Username=${BACKEND_APP_DB_USER};Password=${BACKEND_APP_DB_PASSWORD}"
+      ALLOWED_ORIGINS_START_BY: "${ALLOWED_ORIGINS_START_BY}"
+      ASPNETCORE_ENVIRONMENT: "Development"
+      ASPNETCORE_URLS: "http://+:${BACKEND_API_PORT}"        
+    build:
+      context: ${BACKEND_RELATIVE_DIR}
+      dockerfile: Dockerfile.dev
+    ports:
+    - "${BACKEND_API_PORT}:8000"
+    volumes:
+    - "${BACKEND_RELATIVE_DIR}:/app"
+    - "/app/bin"
+    - "/app/obj"
+    restart: unless-stopped
+
+networks:
+  default:
+    name: ${NETWORK_NAME}

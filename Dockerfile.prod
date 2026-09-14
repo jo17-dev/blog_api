@@ -1,0 +1,36 @@
+
+
+FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
+
+WORKDIR /src
+
+# Copier le fichier projet (.csproj) et restaurer les dépendances
+COPY ["*.csproj", "."]
+
+# installation de dotnet ef pour les migrations
+RUN dotnet tool install --global dotnet-ef
+ENV PATH="$PATH:/root/.dotnet/tools"
+
+
+RUN dotnet restore
+
+# Copier tout le code source
+COPY . .
+
+# Publier l'application en mode Release
+RUN dotnet publish -c Release -o /app/publish
+
+
+# STADE 2 : RUNTIME (exécution seule)
+
+FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS runtime
+
+WORKDIR /app
+
+# Copier les fichiers publiés depuis le stage build
+COPY --from=build /app/publish .
+
+EXPOSE 8000
+
+# Lancer l'application
+ENTRYPOINT ["dotnet", "nom_de_lapp.dll"]
