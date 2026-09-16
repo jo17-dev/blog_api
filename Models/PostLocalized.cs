@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using blog_api.Enums;
 
@@ -26,6 +27,9 @@ public class PostLocalized
     [Required]
     [MinLength(2)]
     public string Content {get; set;} = string.Empty;
+    
+    [DefaultValue(false)]
+    public bool IsDeleted {get; set;}
 
     public Post? Post {get; set;}
 }

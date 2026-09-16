@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using blog_api.Enums;
 
@@ -17,6 +18,9 @@ public class User {
     [Required]
     [EnumDataType(typeof(UserStatus))]
     public UserStatus Status {get; set;}
+    
+    [DefaultValue(false)]
+    public bool IsDeleted {get; set;}
     
     public long? LastLoginAt {get; set;} = null;
 

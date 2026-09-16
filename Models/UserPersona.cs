@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using blog_api.Enums;
 
@@ -20,6 +21,10 @@ public class UserPersona {
     public string? Bio {get; set;} = null;
 
     public string? Socials {get; set;} = null;
+
+    [DefaultValue(false)]
+    public bool IsDeleted {get; set;}
+        
     public long CreatedAt {get; set;}
     public long? UPdatedAt {get; set;} = null;
 }
